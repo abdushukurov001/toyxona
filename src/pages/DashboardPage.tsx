@@ -4,12 +4,20 @@ import { useAuth } from '../context/AuthContext';
 import { motion } from 'framer-motion';
 import { 
   LogOut, PlusCircle, 
-  Edit, Trash2, 
+   Trash2, 
 } from 'lucide-react';
 import Button from '../components/ui/Button';
 import DashboardHomePage from './DashboardHomePage';
 import { Dialog } from '@headlessui/react';
 import Navbar from './Components/Navbar';
+import StaffList from './Components/StaffList';
+import EventsTab from './Components/Events';
+import CategoryTab from './Components/CategoryTab';
+import PriceTab from './Components/PriceTab';
+import AboutTab from './Components/AboutTab';
+import MessagesTab from './Components/MessagesTab';
+import SocialMediaForm from './Components/SocialMediaForm';
+import SettingsForm from './Components/SettingsForm';
 
 const DashboardPage: React.FC = () => {
   const { user, logout } = useAuth();
@@ -61,358 +69,55 @@ const DashboardPage: React.FC = () => {
               {activeTab === 'home' && <DashboardHomePage />}
 
               {activeTab === 'staff' && (
-                <div>
-                  <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-xl font-serif">Xodimlar ro'yxati</h2>
-                    <Button onClick={() => setIsAddStaffModalOpen(true)}>
-                      <PlusCircle size={18} className="mr-2" />
-                      Yangi xodim qo'shish
-                    </Button>
-                  </div>
-                  <div className="overflow-x-auto">
-                    <table className="w-full">
-                      <thead>
-                        <tr className="bg-gray-50">
-                          <th className="px-4 py-2 text-left">Ism</th>
-                          <th className="px-4 py-2 text-left">Lavozim</th>
-                          <th className="px-4 py-2 text-left">Ish vaqti</th>
-                          <th className="px-4 py-2 text-left">Maosh turi</th>
-                          <th className="px-4 py-2 text-left">Maosh</th>
-                          <th className="px-4 py-2 text-left">Boshlagan sana</th>
-                          <th className="px-4 py-2 text-left">Amallar</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr className="border-t">
-                          <td className="px-4 py-2">Ahmedov Bobur</td>
-                          <td className="px-4 py-2">Director</td>
-                          <td className="px-4 py-2">09:00 - 18:00</td>
-                          <td className="px-4 py-2">Oylik</td>
-                          <td className="px-4 py-2">5,000,000 so'm</td>
-                          <td className="px-4 py-2">2024-01-15</td>
-                          <td className="px-4 py-2 space-x-2">
-                            <Button size="sm" variant="outline">
-                              <Edit size={14} className="mr-1" />
-                              O'zgartirish
-                            </Button>
-                            <Button size="sm" variant="outline" className="text-red-500 hover:text-red-600">
-                              <Trash2 size={14} className="mr-1" />
-                              O'chirish
-                            </Button>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
+                  <StaffList onAddStaff={() => setIsAddStaffModalOpen(true)} />
               )}
 
               {activeTab === 'events' && (
-                <div>
-                  <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-xl font-serif">Tadbirlar ro'yxati</h2>
-                    <Button onClick={() => setIsAddEventModalOpen(true)}>
-                      <PlusCircle size={18} className="mr-2" />
-                      Yangi tadbir qo'shish
-                    </Button>
-                  </div>
-                  <div className="overflow-x-auto">
-                    <table className="w-full">
-                      <thead>
-                        <tr className="bg-gray-50">
-                          <th className="px-4 py-2 text-left">Sana</th>
-                          <th className="px-4 py-2 text-left">Tadbir turi</th>
-                          <th className="px-4 py-2 text-left">Mijoz</th>
-                          <th className="px-4 py-2 text-left">Telefon</th>
-                          <th className="px-4 py-2 text-left">Mehmonlar soni</th>
-                          <th className="px-4 py-2 text-left">Narxi</th>
-                          <th className="px-4 py-2 text-left">Amallar</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr className="border-t">
-                          <td className="px-4 py-2">2025-05-15</td>
-                          <td className="px-4 py-2">To'y marosimi</td>
-                          <td className="px-4 py-2">Karimov A.</td>
-                          <td className="px-4 py-2">+998 90 123 45 67</td>
-                          <td className="px-4 py-2">200</td>
-                          <td className="px-4 py-2">180,000 so'm</td>
-                          <td className="px-4 py-2 space-x-2">
-                            <Button size="sm" variant="outline">
-                              <Edit size={14} className="mr-1" />
-                              O'zgartirish
-                            </Button>
-                            <Button size="sm" variant="outline" className="text-red-500 hover:text-red-600">
-                              <Trash2 size={14} className="mr-1" />
-                              O'chirish
-                            </Button>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
+                 <EventsTab onAddEvent={() => setIsAddEventModalOpen(true)} />
               )}
 
               {activeTab === 'categories' && (
-                <div>
-                  <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-xl font-serif">Tadbir turlari</h2>
-                    <Button onClick={() => setIsAddCategoryModalOpen(true)}>
-                      <PlusCircle size={18} className="mr-2" />
-                      Yangi tur qo'shish
-                    </Button>
-                  </div>
-                  <div className="overflow-x-auto">
-                    <table className="w-full">
-                      <thead>
-                        <tr className="bg-gray-50">
-                          <th className="px-4 py-2 text-left">Nomi</th>
-                          <th className="px-4 py-2 text-left">Tavsif</th>
-                          <th className="px-4 py-2 text-left">Rasm</th>
-                          <th className="px-4 py-2 text-left">Amallar</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr className="border-t">
-                          <td className="px-4 py-2">To'y marosimi</td>
-                          <td className="px-4 py-2">To'y va nikoh marosimlari</td>
-                          <td className="px-4 py-2">
-                            <img 
-                              src="https://images.pexels.com/photos/1395967/pexels-photo-1395967.jpeg" 
-                              alt="To'y" 
-                              className="w-16 h-16 object-cover rounded"
-                            />
-                          </td>
-                          <td className="px-4 py-2 space-x-2">
-                            <Button size="sm" variant="outline">
-                              <Edit size={14} className="mr-1" />
-                              O'zgartirish
-                            </Button>
-                            <Button size="sm" variant="outline" className="text-red-500 hover:text-red-600">
-                              <Trash2 size={14} className="mr-1" />
-                              O'chirish
-                            </Button>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
+                 <CategoryTab onAddCategory={() => setIsAddCategoryModalOpen(true)} />
               )}
 
               {activeTab === 'prices' && (
-                <div>
-                  <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-xl font-serif">Narxlar</h2>
-                    <Button onClick={() => setIsAddPricePackageModalOpen(true)}>
-                      <PlusCircle size={18} className="mr-2" />
-                      Yangi tarif qo'shish
-                    </Button>
-                  </div>
-                  <div className="overflow-x-auto">
-                    <table className="w-full">
-                      <thead>
-                        <tr className="bg-gray-50">
-                          <th className="px-4 py-2 text-left">Nomi</th>
-                          <th className="px-4 py-2 text-left">Narxi</th>
-                          <th className="px-4 py-2 text-left">Tavsif</th>
-                          <th className="px-4 py-2 text-left">Xizmatlar</th>
-                          <th className="px-4 py-2 text-left">Amallar</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr className="border-t">
-                          <td className="px-4 py-2">Standart</td>
-                          <td className="px-4 py-2">180,000 so'm</td>
-                          <td className="px-4 py-2">Asosiy xizmatlar to'plami</td>
-                          <td className="px-4 py-2">
-                            <ul className="list-disc list-inside">
-                              <li>2 xil taom</li>
-                              <li>Ichimliklar</li>
-                              <li>Bezatish</li>
-                            </ul>
-                          </td>
-                          <td className="px-4 py-2 space-x-2">
-                            <Button size="sm" variant="outline">
-                              <Edit size={14} className="mr-1" />
-                              O'zgartirish
-                            </Button>
-                            <Button size="sm" variant="outline" className="text-red-500 hover:text-red-600">
-                              <Trash2 size={14} className="mr-1" />
-                              O'chirish
-                            </Button>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
+                 <PriceTab onAddPricePackage={() => setIsAddPricePackageModalOpen(true)} />
               )}
 
               {activeTab === 'about' && (
-                <div>
-                  <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-xl font-serif">Biz haqimizda</h2>
-                    <Button onClick={() => setIsEditAboutModalOpen(true)}>
-                      <Edit size={18} className="mr-2" />
-                      Tahrirlash
-                    </Button>
-                  </div>
-                  <div className="space-y-6">
-                    <div>
-                      <h3 className="font-medium mb-2">Asosiy ma'lumot</h3>
-                      <p className="text-gray-600">
-                        2015-yildan buyon biz mijozlarimizga yuqori sifatli xizmat ko'rsatib kelmoqdamiz. 
-                        Bizning to'yxonamiz zamonaviy jihozlar, professional xodimlar va qulay sharoitlar bilan 
-                        ta'minlangan.
-                      </p>
-                    </div>
-                    <div>
-                      <h3 className="font-medium mb-2">Rasm</h3>
-                      <img 
-                        src="https://images.pexels.com/photos/1157557/pexels-photo-1157557.jpeg" 
-                        alt="About" 
-                        className="w-full max-w-lg rounded-lg"
-                      />
-                    </div>
-                    <div>
-                      <h3 className="font-medium mb-2">Statistika</h3>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="p-4 bg-gray-50 rounded-lg">
-                          <p className="text-2xl font-bold text-amber-500">1000+</p>
-                          <p className="text-gray-600">Muvaffaqiyatli tadbirlar</p>
-                        </div>
-                        <div className="p-4 bg-gray-50 rounded-lg">
-                          <p className="text-2xl font-bold text-amber-500">98%</p>
-                          <p className="text-gray-600">Mijozlar tavsiyasi</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                  <AboutTab onEditAbout={() => setIsEditAboutModalOpen(true)} />
               )}
 
               {activeTab === 'messages' && (
-                <div>
-                  <h2 className="text-xl font-serif mb-6">Xabarlar</h2>
-                  <div className="overflow-x-auto">
-                    <table className="w-full">
-                      <thead>
-                        <tr className="bg-gray-50">
-                          <th className="px-4 py-2 text-left">Sana</th>
-                          <th className="px-4 py-2 text-left">Ism</th>
-                          <th className="px-4 py-2 text-left">Telefon</th>
-                          <th className="px-4 py-2 text-left">Xabar</th>
-                          <th className="px-4 py-2 text-left">Holat</th>
-                          <th className="px-4 py-2 text-left">Amallar</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr className="border-t">
-                          <td className="px-4 py-2">2025-03-15</td>
-                          <td className="px-4 py-2">Azizov Jasur</td>
-                          <td className="px-4 py-2">+998 90 123 45 67</td>
-                          <td className="px-4 py-2">Toy haqida ma'lumot olmoqchi edim</td>
-                          <td className="px-4 py-2">
-                            <span className="px-2 py-1 rounded-full text-xs bg-amber-100 text-amber-800">
-                              Yangi
-                            </span>
-                          </td>
-                          <td className="px-4 py-2">
-                            <Button size="sm" variant="outline" className="text-red-500 hover:text-red-600">
-                              <Trash2 size={14} className="mr-1" />
-                              O'chirish
-                            </Button>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
+                <MessagesTab messages={[
+                  {
+                    date: '2025-03-15',
+                    name: 'Azizov Jasur',
+                    phone: '+998 90 123 45 67',
+                    message: 'Toy haqida ma\'lumot olmoqchi edim',
+                    status: 'Yangi'
+                  },
+                 
+                ]}
+                onDeleteMessage={() => {
+                 
+                }}/>
               )}
 
               {activeTab === 'social' && (
                 <div>
-                  <h2 className="text-xl font-serif mb-6">Ijtimoiy tarmoqlar</h2>
-                  <form className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Instagram
-                      </label>
-                      <input
-                        type="text"
-                        className="w-full px-4 py-2 border border-gray-300 rounded-md"
-                        placeholder="https://instagram.com/username"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Facebook
-                      </label>
-                      <input
-                        type="text"
-                        className="w-full px-4 py-2 border border-gray-300 rounded-md"
-                        placeholder="https://facebook.com/username"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Telegram
-                      </label>
-                      <input
-                        type="text"
-                        className="w-full px-4 py-2 border border-gray-300 rounded-md"
-                        placeholder="https://t.me/username"
-                      />
-                    </div>
-                    <Button type="submit">
-                      Saqlash
-                    </Button>
-                  </form>
-                </div>
+                <h2 className="text-xl font-serif mb-6">Ijtimoiy tarmoqlar</h2>
+                <SocialMediaForm />
+              </div>
               )}
 
-              {activeTab === 'settings' && (
-                <div>
-                  <h2 className="text-xl font-serif mb-6">Sozlamalar</h2>
-                  <form className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        To'yxona nomi
-                      </label>
-                      <input
-                        type="text"
-                        className="w-full px-4 py-2 border border-gray-300 rounded-md"
-                        defaultValue="Luxury Venue"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Manzil
-                      </label>
-                      <input
-                        type="text"
-                        className="w-full px-4 py-2 border border-gray-300 rounded-md"
-                        defaultValue="123 Venue Street, Tashkent"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Telefon
-                      </label>
-                      <input
-                        type="text"
-                        className="w-full px-4 py-2 border border-gray-300 rounded-md"
-                        defaultValue="+998 90 123 45 67"
-                      />
-                    </div>
-                    <Button type="submit">
-                      Saqlash
-                    </Button>
-                  </form>
-                </div>
-              )}
+{activeTab === 'settings' && (
+  <div>
+    <h2 className="text-xl font-serif mb-6">Sozlamalar</h2>
+    <SettingsForm />
+  </div>
+)}
+
             </motion.div>
           </div>
         </div>
