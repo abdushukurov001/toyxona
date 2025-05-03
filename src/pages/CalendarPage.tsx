@@ -4,15 +4,22 @@ import DatePicker from 'react-datepicker';
 import { calendarEvents } from '../data';
 import SectionHeading from '../components/ui/SectionHeading';
 import "react-datepicker/dist/react-datepicker.css";
+import { useNavigate } from 'react-router-dom';
 
 const CalendarPage: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  
+  const navigate = useNavigate();
   const eventsOnSelectedDate = selectedDate
     ? calendarEvents.filter(event => 
         event.date.toDateString() === selectedDate.toDateString()
       )
     : [];
+
+    const scrollToContact = () => {
+      navigate('/#contact');
+    };
+    
+    
 
   return (
     <div className="pt-20">
@@ -113,35 +120,47 @@ const CalendarPage: React.FC = () => {
               </h3>
               
               {eventsOnSelectedDate.length > 0 ? (
-                <div className="space-y-4">
-                  {eventsOnSelectedDate.map(event => (
-                    <div
-                      key={event.id}
-                      className="bg-gray-50 rounded-lg p-4 transition-all duration-300 hover:shadow-md"
-                    >
-                      <div className="h-56 mb-4 rounded-lg overflow-hidden">
-                        <img
-                          src={event.image}
-                          alt={event.title}
-                          className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-                        />
-                      </div>
-                      <h4 className="text-lg font-medium text-gray-800 mb-2">
-                        {event.title}
-                      </h4>
-                      <p className="text-amber-500">
-                        {event.eventType.charAt(0).toUpperCase() + event.eventType.slice(1)}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-gray-600">
-                  {selectedDate 
-                    ? 'Bu kunda tadbirlar yo\'q'
-                    : 'Tadbirlarni ko\'rish uchun kunni tanlang'}
-                </p>
-              )}
+  <div className="space-y-4">
+    {eventsOnSelectedDate.map(event => (
+      <div
+        key={event.id}
+        className="bg-gray-50 rounded-lg p-4 transition-all duration-300 hover:shadow-md"
+      >
+        <div className="h-56 mb-4 rounded-lg overflow-hidden">
+          <img
+            src={event.image}
+            alt={event.title}
+            className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+          />
+        </div>
+        <h4 className="text-lg font-medium text-gray-800 mb-2">
+          {event.title}
+        </h4>
+        <p className="text-amber-500">
+          {event.eventType.charAt(0).toUpperCase() + event.eventType.slice(1)}
+        </p>
+      </div>
+    ))}
+  </div>
+) : (
+  <div>
+    <p className="text-gray-600 mb-4">
+      {selectedDate 
+        ? "Bu kunda tadbirlar yo'q"
+        : "Tadbirlarni ko'rish uchun kunni tanlang"}
+    </p>
+
+    {selectedDate && (
+      <button
+        onClick={scrollToContact}
+        className="bg-amber-500 hover:bg-amber-600 text-white font-semibold py-2 px-4 rounded transition duration-300"
+      >
+        Band qilish
+      </button>
+    )}
+  </div>
+)}
+
             </motion.div>
           </div>
         </div>

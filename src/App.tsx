@@ -10,11 +10,12 @@ import PricesSection from './components/sections/PricesSection';
 import NewsSection from './components/sections/NewsSection';
 import StaffSection from './components/sections/StaffSection';
 import ContactSection from './components/sections/ContactSection';
-import GalleryPage from './pages/GalleryPage';
 import CalendarPage from './pages/CalendarPage';
 import AboutPage from './pages/AboutPage';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
+import GalleryPage from './pages/GalleryPage';
+import GallerySlider from './components/sections/GallerySlider'
 
 function App() {
   return (
@@ -36,13 +37,14 @@ function App() {
                       <HeroSection />
                       <AboutSection />
                       <ServicesSection />
+                      <GallerySlider/>
                       <PricesSection />
                       <NewsSection />
                       <StaffSection />
                       <ContactSection />
                     </>
                   } />
-                  <Route path="/gallery" element={<GalleryPage />} />
+                  <Route path="/gallery" element={<GalleryPage/>} />
                   <Route path="/calendar" element={<CalendarPage />} />
                   <Route path="/about" element={<AboutPage />} />
                 </Routes>

@@ -1,6 +1,5 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import SectionHeading from '../components/ui/SectionHeading';
 import ServicesSection from '../components/sections/ServicesSection';
 import StaffSection from '../components/sections/StaffSection';
 
