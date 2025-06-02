@@ -17,6 +17,8 @@ import DashboardPage from './pages/DashboardPage';
 import GalleryPage from './pages/GalleryPage';
 import GallerySlider from './components/sections/GallerySlider'
 
+
+
 function App() {
   return (
     <AuthProvider>
