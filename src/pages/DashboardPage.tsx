@@ -14,13 +14,14 @@ import AboutTab from './Components/AboutTab';
 import MessagesTab from './Components/MessagesTab';
 import SocialMediaForm from './Components/SocialMediaForm';
 import SettingsForm from './Components/SettingsForm';
-import {
-  AddStaffModal,
-  AddEventModal,
-  AddCategoryModal,
-  AddPricePackageModal,
-  EditAboutModal
-} from './Components/Modals.tsx/Modals';
+import { AddEventModal } from './Components/Modals.tsx/AddEventModel';
+import { AddCategoryModal } from './Components/Modals.tsx/AddCategoryModel';
+import { AddPricePackageModal } from './Components/Modals.tsx/AddPriceModel';
+import { EditAboutModal } from './Components/Modals.tsx/EditAboutModal';
+import { AddStaffModal } from './Components/Modals.tsx/AddStaffModel';
+
+
+
 
 const DashboardPage: React.FC = () => {
   const { user, logout } = useAuth();
@@ -42,7 +43,10 @@ const DashboardPage: React.FC = () => {
       case 'home':
         return <DashboardHomePage />;
       case 'staff':
-        return <StaffList onAddStaff={() => setIsAddStaffModalOpen(true)} />;
+        return   <StaffList onAddStaff={() => {
+      console.log("Add button bosildi"); // Bu ham muhim!
+      setIsAddStaffModalOpen(true);
+    }} />
       case 'events':
         return <EventsTab onAddEvent={() => setIsAddEventModalOpen(true)} />;
       case 'categories':
@@ -108,10 +112,13 @@ const DashboardPage: React.FC = () => {
       </div>
 
       {/* Modals */}
-      <AddStaffModal 
-        isOpen={isAddStaffModalOpen} 
-        onClose={() => setIsAddStaffModalOpen(false)} 
-      />
+      <AddStaffModal
+      isOpen={isAddStaffModalOpen}
+      onClose={() => {
+        console.log("Modal yopildi"); // Yopishda ham chiqishi kerak
+        setIsAddStaffModalOpen(false);
+      }}
+    />
       
       <AddEventModal 
         isOpen={isAddEventModalOpen} 

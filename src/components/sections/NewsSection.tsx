@@ -1,27 +1,36 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { newsItems } from '../../data';
 import SectionHeading from '../ui/SectionHeading';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Pagination } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
-// import './clamp.css'; // 👈 line-clamp uchun CSS import
-
+import client from '../../services';
 
 type NewsItem = {
   id: number;
   title: string;
-  content: string;
-  image: string;
-  date: string;
+  description: string;
+  image: string | null;
+  created_at: string;
 };
 
-
-
 const NewsSection: React.FC = () => {
+  const [newsItems, setNewsItems] = useState<NewsItem[]>([]);
   const [selectedNews, setSelectedNews] = useState<NewsItem | null>(null);
 
+  useEffect(() => {
+    const fetchNews = async () => {
+      try {
+        const res = await await client.get('/api/v1/web/get_news/');
+        setNewsItems(res.data);
+      } catch (error) {
+        console.error('Yangiliklarni yuklashda xatolik:', error);
+      }
+    };
+
+    fetchNews();
+  }, []);
 
   const handleOpenModal = (item: NewsItem) => {
     setSelectedNews(item);
@@ -47,9 +56,7 @@ const NewsSection: React.FC = () => {
             delay: 5000,
             disableOnInteraction: false,
           }}
-          pagination={{
-            clickable: true,
-          }}
+          pagination={{ clickable: true }}
           breakpoints={{
             640: { slidesPerView: 2 },
             1024: { slidesPerView: 3 },
@@ -58,29 +65,30 @@ const NewsSection: React.FC = () => {
         >
           {newsItems.map((item) => (
             <SwiperSlide key={item.id}>
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5 }}
-                onClick={() => handleOpenModal(item)}
-                className="bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer hover:shadow-xl transition"
-              >
-                <div className="h-48 overflow-hidden">
-                  <img 
-                    src={item.image} 
-                    alt={item.title}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div className="p-6">
-                  <div className="text-sm text-amber-500 mb-2">
-                    {new Date(item.date).toLocaleDateString('uz-UZ')}
-                  </div>
-                  <h3 className="text-xl font-serif line-clamp-1 text-gray-800 mb-2">{item.title}</h3>
-                  <p className="text-gray-600 line-clamp-3">{item.content}</p>
-                </div>
-              </motion.div>
+             <motion.div
+  initial={{ opacity: 0, y: 20 }}
+  whileInView={{ opacity: 1, y: 0 }}
+  viewport={{ once: true }}
+  transition={{ duration: 0.5 }}
+  onClick={() => handleOpenModal(item)}
+  className="bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer hover:shadow-xl transition min-h-[420px] flex flex-col"
+>
+  <div className="h-48 overflow-hidden">
+    <img 
+      src={`${item.image}`} 
+      alt={item.title}
+      className="w-full h-full object-cover"
+    />
+  </div>
+  <div className="p-6 flex-1 flex flex-col">
+    <div className="text-sm text-amber-500 mb-2">
+      {new Date(item.created_at).toLocaleDateString('uz-UZ')}
+    </div>
+    <h3 className="text-xl font-serif line-clamp-1 text-gray-800 mb-2">{item.title}</h3>
+    <p className="text-gray-600 line-clamp-3 flex-grow">{item.description}</p>
+  </div>
+</motion.div>
+
             </SwiperSlide>
           ))}
         </Swiper>
@@ -94,7 +102,7 @@ const NewsSection: React.FC = () => {
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="bg-white rounded-lg max-w-lg w-full mx-4 p-6 relative shadow-2xl"
+            className="bg-white h-[500px] overflow-y-auto rounded-lg max-w-lg w-full mx-4 p-6 relative shadow-2xl"
           >
             <button
               onClick={handleCloseModal}
@@ -103,15 +111,15 @@ const NewsSection: React.FC = () => {
               ✕
             </button>
             <img
-              src={selectedNews.image}
+              src={`${selectedNews.image}`}
               alt={selectedNews.title}
               className="w-full h-64 object-cover rounded mb-4"
             />
             <div className="text-sm text-amber-500 mb-2">
-              {new Date(selectedNews.date).toLocaleDateString('uz-UZ')}
+              {new Date(selectedNews.created_at).toLocaleDateString('uz-UZ')}
             </div>
             <h3 className="text-2xl font-serif text-gray-800 mb-4">{selectedNews.title}</h3>
-            <p className="text-gray-700">{selectedNews.content}</p>
+            <p className="text-gray-700">{selectedNews.description}</p>
           </div>
         </div>
       )}
