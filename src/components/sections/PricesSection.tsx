@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import SectionHeading from '../ui/SectionHeading';
-import { Check } from 'lucide-react';
-import client from '../../services'; // axios instance
+import { Check, ChevronLeft, ChevronRight } from 'lucide-react';
+import client from '../../services';
 import { toast } from 'react-toastify';
 
 interface Highlight {
@@ -22,11 +22,15 @@ const PricesSection: React.FC = () => {
   const [prices, setPrices] = useState<PricePackage[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
+  const sliderRef = useRef<number | null>(null);
+
 
   useEffect(() => {
     const fetchPrices = async () => {
       try {
-        const response = await client.get('/api/v1/web/get_prices/');
+        const response = await client.get('/uz/api/v1/web/get_prices/');
         setPrices(response.data);
         setError(null);
       } catch (err) {
@@ -41,48 +45,147 @@ const PricesSection: React.FC = () => {
     fetchPrices();
   }, []);
 
+  // Auto-slide functionality
+  useEffect(() => {
+    if (prices.length <= 1) return;
+
+    const startSlider = () => {
+      sliderRef.current = setInterval(() => {
+        if (!isHovered) {
+          setCurrentIndex((prev) => (prev + 1) % prices.length);
+        }
+      }, 3000);
+    };
+
+    startSlider();
+
+    return () => {
+      if (sliderRef.current) {
+        clearInterval(sliderRef.current);
+      }
+    };
+  }, [prices.length, isHovered]);
+
+  const goToNext = () => {
+    setCurrentIndex((prev) => (prev + 1) % prices.length);
+    resetTimer();
+  };
+
+  const goToPrev = () => {
+    setCurrentIndex((prev) => (prev - 1 + prices.length) % prices.length);
+    resetTimer();
+  };
+
+  const resetTimer = () => {
+    if (sliderRef.current) {
+      clearInterval(sliderRef.current);
+    }
+    sliderRef.current = setInterval(() => {
+      if (!isHovered) {
+        setCurrentIndex((prev) => (prev + 1) % prices.length);
+      }
+    }, 3000);
+  };
+
+  const getVisiblePackages = () => {
+    if (window.innerWidth >= 1024) {
+      // For large screens, show 3 packages
+      return [
+        prices[currentIndex % prices.length],
+        prices[(currentIndex + 1) % prices.length],
+        prices[(currentIndex + 2) % prices.length],
+      ];
+    } else if (window.innerWidth >= 768) {
+      // For medium screens, show 2 packages
+      return [
+        prices[currentIndex % prices.length],
+        prices[(currentIndex + 1) % prices.length],
+      ];
+    }
+    // For small screens, show 1 package
+    return [prices[currentIndex % prices.length]];
+  };
+
+  if (loading) return <p className="text-center text-gray-600 py-20">Yuklanmoqda...</p>;
+  if (error) return <p className="text-center text-red-500 py-20">{error}</p>;
+  if (prices.length === 0) return <p className="text-center text-gray-500 py-20">Narxlar topilmadi.</p>;
+
   return (
-    <section id="prices" className="py-20 bg-white">
+    <section id="prices" className="py-20 bg-white relative overflow-hidden">
       <div className="container mx-auto px-4 md:px-6">
         <SectionHeading 
           title="Narxlar"
           subtitle="Har bir mehmon uchun maxsus tariflar"
         />
-        
-        {loading && <p className="text-center text-gray-600">Yuklanmoqda...</p>}
-        {error && <p className="text-center text-red-500">{error}</p>}
-        
-        {!loading && !error && prices.length === 0 && (
-          <p className="text-center text-gray-500">Narxlar topilmadi.</p>
-        )}
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {prices.map((pkg, index) => (
-            <motion.div
-              key={pkg.id}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="bg-white rounded-lg shadow-lg p-8 border border-gray-200 hover:shadow-xl transition-shadow duration-300 flex flex-col h-full"
-            >
-              <h3 className="text-2xl font-serif text-gray-800 mb-2">{pkg.type}</h3>
-              <div className="text-3xl font-bold text-amber-500 mb-4">
-                {pkg.price.toLocaleString()} so'm
-                <span className="text-sm text-gray-500 font-normal">/kishi</span>
-              </div>
-              <p className="text-gray-600 mb-6">{pkg.description}</p>
-              <ul className="space-y-3 mb-8 max-h-48 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 flex-1">
-                {pkg.highlights.map((highlight) => (
-                  <li key={highlight.id} className="flex items-center text-gray-600">
-                    <Check size={20} className="text-amber-500 mr-2 flex-shrink-0" />
-                    <span>{highlight.description}</span>
-                  </li>
-                ))}
-              </ul>
-            </motion.div>
-          ))}
+
+        <div 
+          className="relative"
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+        >
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 relative">
+            {getVisiblePackages().map((pkg, index) => (
+              <motion.div
+                key={`${pkg.id}-${currentIndex}`}
+                initial={{ opacity: 0, x: index === 0 ? -50 : index === 2 ? 50 : 0 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5 }}
+                className="bg-white rounded-lg shadow-lg p-8 border border-gray-200 hover:shadow-xl transition-all duration-300 flex flex-col h-full mx-auto w-full"
+              >
+                <h3 className="text-2xl font-serif text-gray-800 mb-2">{pkg.type}</h3>
+                <div className="text-3xl font-bold text-amber-500 mb-4">
+                  {pkg.price.toLocaleString()} so'm
+                  <span className="text-sm text-gray-500 font-normal">/kishi</span>
+                </div>
+                <p className="text-gray-600 mb-6">{pkg.description}</p>
+                <ul className="space-y-3 mb-8 max-h-48 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 flex-1">
+                  {pkg.highlights.map((highlight) => (
+                    <li key={highlight.id} className="flex items-center text-gray-600">
+                      <Check size={20} className="text-amber-500 mr-2 flex-shrink-0" />
+                      <span>{highlight.description}</span>
+                    </li>
+                  ))}
+                </ul>
+              </motion.div>
+            ))}
+          </div>
+
+          {prices.length > 1 && (
+            <>
+              <button 
+                onClick={goToPrev}
+                className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-2 bg-white p-2 rounded-full shadow-md hover:bg-gray-100 z-10"
+                aria-label="Previous"
+              >
+                <ChevronLeft size={24} className="text-amber-500" />
+              </button>
+              <button 
+                onClick={goToNext}
+                className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-2 bg-white p-2 rounded-full shadow-md hover:bg-gray-100 z-10"
+                aria-label="Next"
+              >
+                <ChevronRight size={24} className="text-amber-500" />
+              </button>
+            </>
+          )}
         </div>
+
+        {/* Indicators */}
+        {prices.length > 1 && (
+          <div className="flex justify-center mt-8 space-x-2">
+            {prices.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => {
+                  setCurrentIndex(index);
+                  resetTimer();
+                }}
+                className={`w-3 h-3 rounded-full ${currentIndex % prices.length === index ? 'bg-amber-500' : 'bg-gray-300'}`}
+                aria-label={`Go to slide ${index + 1}`}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

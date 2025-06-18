@@ -46,6 +46,7 @@ const StaffSection: React.FC = () => {
           autoplay={{
             delay: 3000,
             disableOnInteraction: false,
+            pauseOnMouseEnter: true,
           }}
           pagination={{
             clickable: true,
@@ -70,12 +71,15 @@ const StaffSection: React.FC = () => {
                 className="bg-white rounded-lg shadow-lg overflow-hidden"
               >
                 <div className="w-full md:h-[400px] h-[300px] aspect-[3/4] overflow-hidden">
-  <img 
-    src={member.image ? `${member.image}` : '/no-image.png'} 
-    alt={`${member.first_name} ${member.last_name}`}
-    className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
-  />
-</div>
+                  <img 
+                    src={member.image ? member.image : '/no-image.png'} 
+                    alt={`${member.first_name} ${member.last_name}`}
+                    className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = '/no-image.png';
+                    }}
+                  />
+                </div>
 
                 <div className="p-6 text-center">
                   <h3 className="text-xl font-serif text-gray-800 mb-1">
