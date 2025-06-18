@@ -24,8 +24,7 @@ const PricesSection: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
-  const sliderRef = useRef<number | null>(null);
-
+  const sliderRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     const fetchPrices = async () => {
@@ -34,9 +33,9 @@ const PricesSection: React.FC = () => {
         setPrices(response.data);
         setError(null);
       } catch (err) {
-        setError("Narxlarni yuklashda xatolik yuz berdi.");
-        console.error("Narxlarni olishda xatolik:", err);
-        toast.error("Narxlarni yuklashda xatolik");
+        setError('Narxlarni yuklashda xatolik yuz berdi.');
+        console.error('Narxlarni olishda xatolik:', err);
+        toast.error('Narxlarni yuklashda xatolik');
       } finally {
         setLoading(false);
       }
@@ -80,30 +79,37 @@ const PricesSection: React.FC = () => {
     if (sliderRef.current) {
       clearInterval(sliderRef.current);
     }
-    sliderRef.current = setInterval(() => {
-      if (!isHovered) {
-        setCurrentIndex((prev) => (prev + 1) % prices.length);
-      }
-    }, 3000);
+    if (prices.length > 1) {
+      sliderRef.current = setInterval(() => {
+        if (!isHovered) {
+          setCurrentIndex((prev) => (prev + 1) % prices.length);
+        }
+      }, 3000);
+    }
   };
 
   const getVisiblePackages = () => {
-    if (window.innerWidth >= 1024) {
-      // For large screens, show 3 packages
-      return [
-        prices[currentIndex % prices.length],
-        prices[(currentIndex + 1) % prices.length],
-        prices[(currentIndex + 2) % prices.length],
-      ];
-    } else if (window.innerWidth >= 768) {
-      // For medium screens, show 2 packages
-      return [
-        prices[currentIndex % prices.length],
-        prices[(currentIndex + 1) % prices.length],
-      ];
+    const width = window.innerWidth;
+    let numVisible: number;
+
+    if (width >= 1024) {
+      numVisible = 3; // Large screens: 3 cards
+    } else if (width >= 768) {
+      numVisible = 2; // Medium screens: 2 cards
+    } else {
+      numVisible = 1; // Small screens: 1 card
     }
-    // For small screens, show 1 package
-    return [prices[currentIndex % prices.length]];
+
+    // Ensure we don't try to display more cards than available
+    numVisible = Math.min(numVisible, prices.length);
+
+    const visiblePackages: PricePackage[] = [];
+    for (let i = 0; i < numVisible; i++) {
+      const index = (currentIndex + i) % prices.length;
+      visiblePackages.push(prices[index]);
+    }
+
+    return visiblePackages;
   };
 
   if (loading) return <p className="text-center text-gray-600 py-20">Yuklanmoqda...</p>;
@@ -113,12 +119,12 @@ const PricesSection: React.FC = () => {
   return (
     <section id="prices" className="py-20 bg-white relative overflow-hidden">
       <div className="container mx-auto px-4 md:px-6">
-        <SectionHeading 
+        <SectionHeading
           title="Narxlar"
           subtitle="Har bir mehmon uchun maxsus tariflar"
         />
 
-        <div 
+        <div
           className="relative"
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
@@ -126,9 +132,10 @@ const PricesSection: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 relative">
             {getVisiblePackages().map((pkg, index) => (
               <motion.div
-                key={`${pkg.id}-${currentIndex}`}
-                initial={{ opacity: 0, x: index === 0 ? -50 : index === 2 ? 50 : 0 }}
+                key={pkg.id} // Use only pkg.id for stable keys
+                initial={{ opacity: 0, x: index * 50 - 50 }}
                 animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: index * 50 - 50 }}
                 transition={{ duration: 0.5 }}
                 className="bg-white rounded-lg shadow-lg p-8 border border-gray-200 hover:shadow-xl transition-all duration-300 flex flex-col h-full mx-auto w-full"
               >
@@ -152,14 +159,14 @@ const PricesSection: React.FC = () => {
 
           {prices.length > 1 && (
             <>
-              <button 
+              <button
                 onClick={goToPrev}
                 className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-2 bg-white p-2 rounded-full shadow-md hover:bg-gray-100 z-10"
                 aria-label="Previous"
               >
                 <ChevronLeft size={24} className="text-amber-500" />
               </button>
-              <button 
+              <button
                 onClick={goToNext}
                 className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-2 bg-white p-2 rounded-full shadow-md hover:bg-gray-100 z-10"
                 aria-label="Next"
@@ -170,7 +177,6 @@ const PricesSection: React.FC = () => {
           )}
         </div>
 
-        {/* Indicators */}
         {prices.length > 1 && (
           <div className="flex justify-center mt-8 space-x-2">
             {prices.map((_, index) => (
@@ -180,7 +186,9 @@ const PricesSection: React.FC = () => {
                   setCurrentIndex(index);
                   resetTimer();
                 }}
-                className={`w-3 h-3 rounded-full ${currentIndex % prices.length === index ? 'bg-amber-500' : 'bg-gray-300'}`}
+                className={`w-3 h-3 rounded-full ${
+                  currentIndex % prices.length === index ? 'bg-amber-500' : 'bg-gray-300'
+                }`}
                 aria-label={`Go to slide ${index + 1}`}
               />
             ))}
