@@ -1,25 +1,92 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import DatePicker from 'react-datepicker';
-import { calendarEvents } from '../data';
 import SectionHeading from '../components/ui/SectionHeading';
 import "react-datepicker/dist/react-datepicker.css";
 import { useNavigate } from 'react-router-dom';
+import client from '../services';
+
+interface CalendarEvent {
+  id: number;
+  book_date: string;
+}
+
+interface Category {
+  id: number;
+  name: string;
+  image: string;
+}
+
+interface EventInfo {
+  id: number;
+  book_date: string;
+  additional_info: string;
+  category: Category;
+}
 
 const CalendarPage: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [bookedDates, setBookedDates] = useState<CalendarEvent[]>([]);
+  const [eventInfo, setEventInfo] = useState<EventInfo | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const navigate = useNavigate();
-  const eventsOnSelectedDate = selectedDate
-    ? calendarEvents.filter(event => 
-        event.date.toDateString() === selectedDate.toDateString()
-      )
-    : [];
 
-    const scrollToContact = () => {
-      navigate('/#contact');
+  useEffect(() => {
+    const today = new Date();
+    setSelectedDate(today);
+  }, []);
+
+  useEffect(() => {
+    const fetchBookedDates = async () => {
+      try {
+        setLoading(true);
+        const response = await client.get('/api/v1/web/get_calendar_datas/');
+        console.log('Booked dates response:', response.data);
+        setBookedDates(response.data || []);
+      } catch (err) {
+        setError('Failed to fetch booked dates');
+        console.error('Error fetching booked dates:', err);
+      } finally {
+        setLoading(false);
+      }
     };
-    
-    
+
+    fetchBookedDates();
+  }, []);
+
+  useEffect(() => {
+    const fetchEventInfo = async () => {
+      if (!selectedDate) return;
+      try {
+        setLoading(true);
+        const dateStr = selectedDate.toISOString().split('T')[0];
+        const response = await client.get(`/api/v1/web/get_calendar_data_info/?date=${dateStr}`);
+        console.log("API javobi:", response.data);
+
+        if (response.data && response.data.book_date) {
+          setEventInfo(response.data);
+        } else {
+          setEventInfo(null);
+        }
+      } catch (err) {
+        console.error('Error fetching event info:', err);
+        setEventInfo(null);
+        setError('Failed to fetch event details');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchEventInfo();
+  }, [selectedDate]);
+
+  const handleBookDate = () => {
+    console.log('Navigating to contact section'); // Debugging
+    navigate('/', { state: { scrollTo: 'contact' } });
+  };
+
+  const highlightDates = bookedDates.map(event => new Date(event.book_date));
 
   return (
     <div className="pt-20">
@@ -28,9 +95,10 @@ const CalendarPage: React.FC = () => {
           title="Band qilingan kunlar"
           subtitle="To'yxonamizning band qilingan kunlarini ko'ring"
         />
-        
+
+        {error && <div className="text-red-500 mb-4">{error}</div>}
+
         <div className="lg:flex justify-between block gap-10">
-          {/* Calendar - Larger and more responsive */}
           <div className="lg:w-[60%] w-[100%] mb-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -38,11 +106,10 @@ const CalendarPage: React.FC = () => {
               transition={{ duration: 0.5 }}
               className="bg-white rounded-xl shadow-xl p-4 md:p-8"
             >
-              <div className="calendar-wrapper max-w-full overflow-x-auto">
-                <style jsx global>{`
+              <div className="calendar-wrapper flex justify-center">
+                <style>{`
                   .react-datepicker {
                     font-size: 1rem !important;
-                    width: 100% !important;
                   }
                   .react-datepicker__month-container {
                     width: 100% !important;
@@ -96,71 +163,70 @@ const CalendarPage: React.FC = () => {
                 `}</style>
                 <DatePicker
                   selected={selectedDate}
-                  onChange={(date) => setSelectedDate(date)}
+                  onChange={(date: Date | null) => setSelectedDate(date)}
                   inline
                   calendarClassName="w-full"
-                  highlightDates={calendarEvents.map(event => event.date)}
+                  highlightDates={highlightDates}
                 />
               </div>
             </motion.div>
           </div>
-          
-          {/* Events List */}
-          <div>
+
+          <div className="lg:w-[40%] w-full">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
-              className="bg-white lg:w-[500px] w-full rounded-xl shadow-xl p-6"
+              className="bg-white rounded-xl shadow-xl p-6 h-full"
             >
               <h3 className="text-xl font-serif text-gray-800 mb-4">
-                {selectedDate 
+                {selectedDate
                   ? `Tanlangan kun: ${selectedDate.toLocaleDateString('uz-UZ')}`
                   : 'Kunni tanlang'}
               </h3>
-              
-              {eventsOnSelectedDate.length > 0 ? (
-  <div className="space-y-4">
-    {eventsOnSelectedDate.map(event => (
-      <div
-        key={event.id}
-        className="bg-gray-50 rounded-lg p-4 transition-all duration-300 hover:shadow-md"
-      >
-        <div className="h-56 mb-4 rounded-lg overflow-hidden">
-          <img
-            src={event.image}
-            alt={event.title}
-            className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-          />
-        </div>
-        <h4 className="text-lg font-medium text-gray-800 mb-2">
-          {event.title}
-        </h4>
-        <p className="text-amber-500">
-          {event.eventType.charAt(0).toUpperCase() + event.eventType.slice(1)}
-        </p>
-      </div>
-    ))}
-  </div>
-) : (
-  <div>
-    <p className="text-gray-600 mb-4">
-      {selectedDate 
-        ? "Bu kunda tadbirlar yo'q"
-        : "Tadbirlarni ko'rish uchun kunni tanlang"}
-    </p>
 
-    {selectedDate && (
-      <button
-        onClick={scrollToContact}
-        className="bg-amber-500 hover:bg-amber-600 text-white font-semibold py-2 px-4 rounded transition duration-300"
-      >
-        Band qilish
-      </button>
-    )}
-  </div>
-)}
-
+              {loading ? (
+                <div className="flex justify-center items-center h-32">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-500"></div>
+                </div>
+              ) : eventInfo ? (
+                <div className="flex-grow">
+                  <div className="bg-gray-50 rounded-lg p-4 transition-all duration-300 hover:shadow-md">
+                    <h4 className="text-lg font-medium text-gray-800 mb-2">
+                      {eventInfo.category?.name}
+                    </h4>
+                    {eventInfo.category?.image && (
+                      <img
+                        src={eventInfo.category.image}
+                        alt={eventInfo.category.name}
+                        className="w-full h-48 object-cover rounded-lg mb-4"
+                      />
+                    )}
+                    <p className="text-gray-600">{eventInfo.additional_info}</p>
+                    {eventInfo.book_date && (
+                      <p className="text-amber-500 mt-2">
+                        Sana: {new Date(eventInfo.book_date).toLocaleDateString("uz-UZ")}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                <div className="flex-grow flex flex-col items-center  justify-center">
+                  <p className="text-gray-600 lg:mt-20 text-center mb-6">
+                    {selectedDate
+                      ? "Bu kunda tadbirlar mavjud emas"
+                      : "Tadbirlarni ko'rish uchun kunni tanlang"}
+                  </p>
+                  {selectedDate && (
+                    <button
+                      onClick={handleBookDate}
+                      className="bg-amber-500 hover:bg-amber-600 text-white font-semibold py-3 px-6 rounded-lg transition duration-300 w-44"
+                    >
+                      Band qilish
+                    </button>
+                  )}
+                </div>
+              )}
             </motion.div>
           </div>
         </div>

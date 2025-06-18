@@ -6,7 +6,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 const scrollToSection = (id: string) => {
   const el = document.getElementById(id);
   if (el) {
-    el.scrollIntoView({ behavior: 'smooth' });
+    const yOffset = -80; // Adjust for navbar height
+    const y = el.getBoundingClientRect().top + window.pageYOffset + yOffset;
+    window.scrollTo({ top: y, behavior: 'smooth' });
+    console.log(`Scrolled to section: ${id}`); // Debugging
+  } else {
+    console.warn(`Section not found: ${id}`); // Debugging
   }
 };
 
@@ -42,13 +47,15 @@ const Navbar: React.FC = () => {
   }, [location]);
 
   useEffect(() => {
+    console.log('Location:', { pathname: location.pathname, hash: location.hash }); // Debugging
     if (location.pathname === '/' && location.hash) {
       const sectionId = location.hash.replace('#', '');
-      scrollToSection(sectionId);
+      setTimeout(() => scrollToSection(sectionId), 500); // Align with HomePage delay
     }
   }, [location]);
 
   const handleNavClick = (id: string) => {
+    console.log(`Navigating to section: ${id}`); // Debugging
     if (location.pathname !== '/') {
       navigate(`/#${id}`);
     } else {
@@ -66,12 +73,12 @@ const Navbar: React.FC = () => {
     >
       <div className="container mx-auto px-4 md:px-6 flex justify-between items-center h-20">
         <Link
-          to="/"    onClick={() => {
+          to="/"
+          onClick={() => {
             if (location.pathname === '/') {
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }
           }}
-        
           className="text-xl md:text-2xl font-serif tracking-wider flex items-center"
         >
           <span className="text-amber-500 mr-1">Luxury</span>
@@ -79,46 +86,49 @@ const Navbar: React.FC = () => {
         </Link>
 
         <nav className="hidden lg:flex space-x-8 list-none">
-        <Link
-  to="/"
-  onClick={() => {
-    if (location.pathname === '/') {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  }}
-  className={getLinkClass('/', scrolled)}
->
-  Bosh sahifa
-</Link>
-  <li onClick={() => handleNavClick('about')} className={getLinkClass('#about', scrolled)}>Biz haqimizda</li>
-  <li>
-  <Link
-    to="/gallery"
-    onClick={() => {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }}
-    className={getLinkClass('/gallery', scrolled)}
-  >
-    Galereya
-  </Link>
-</li>
-
-  <li onClick={() => handleNavClick('prices')} className={getLinkClass('#prices', scrolled)}>Narxlar</li>
-  <li>
-  <Link
-    to="/calendar"
-    onClick={() => {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }}
-    className={getLinkClass('/calendar', scrolled)}
-  >
-    Kalendar
-  </Link>
-</li>
-
-  <li onClick={() => handleNavClick('contact')} className={getLinkClass('#contact', scrolled)}>Bogʻlanish</li>
-</nav>
-
+          <Link
+            to="/"
+            onClick={() => {
+              if (location.pathname === '/') {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }
+            }}
+            className={getLinkClass('/', scrolled)}
+          >
+            Bosh sahifa
+          </Link>
+          <li onClick={() => handleNavClick('about')} className={getLinkClass('#about', scrolled)}>
+            Biz haqimizda
+          </li>
+          <li>
+            <Link
+              to="/gallery"
+              onClick={() => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              className={getLinkClass('/gallery', scrolled)}
+            >
+              Galereya
+            </Link>
+          </li>
+          <li onClick={() => handleNavClick('prices')} className={getLinkClass('#prices', scrolled)}>
+            Narxlar
+          </li>
+          <li>
+            <Link
+              to="/calendar"
+              onClick={() => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              className={getLinkClass('/calendar', scrolled)}
+            >
+              Kalendar
+            </Link>
+          </li>
+          <li onClick={() => handleNavClick('contact')} className={getLinkClass('#contact', scrolled)}>
+            Bogʻlanish
+          </li>
+        </nav>
 
         <button
           onClick={() => setIsOpen(!isOpen)}
@@ -152,7 +162,7 @@ const Navbar: React.FC = () => {
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex flex-col space-y-4">
-                <MobileNavLink  to="/" label="Bosh sahifa" />
+                <MobileNavLink to="/" label="Bosh sahifa" />
                 <MobileNavLink to="/#about" label="Biz haqimizda" />
                 <MobileNavLink to="/gallery" label="Galereya" />
                 <MobileNavLink to="/#prices" label="Narxlar" />
@@ -173,30 +183,35 @@ const getLinkClass = (path: string, scrolled: boolean) => {
   }`;
 };
 
-
 interface MobileNavLinkProps {
   to: string;
   label: string;
 }
 
 const MobileNavLink: React.FC<MobileNavLinkProps> = ({ to, label }) => {
+  const navigate = useNavigate();
+
   const handleClick = () => {
     if (to === '/') {
       window.scrollTo({ top: 0, behavior: 'smooth' });
+      navigate('/');
     } else if (to.includes('#')) {
       const id = to.split('#')[1];
-      setTimeout(() => scrollToSection(id), 100);
+      navigate(`/#${id}`);
+      setTimeout(() => scrollToSection(id), 500); // Align with HomePage delay
+    } else {
+      navigate(to);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
   return (
-    <Link
-      to={to}
+    <button
       onClick={handleClick}
       className="block py-2 text-lg font-medium text-gray-800 hover:text-amber-500 transition-colors duration-200"
     >
       {label}
-    </Link>
+    </button>
   );
 };
 

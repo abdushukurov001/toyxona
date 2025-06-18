@@ -1,21 +1,16 @@
+// src/App.tsx
+
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
-import HeroSection from './components/sections/HeroSection';
-import AboutSection from './components/sections/AboutSection';
-import ServicesSection from './components/sections/ServicesSection';
-import PricesSection from './components/sections/PricesSection';
-import NewsSection from './components/sections/NewsSection';
-import StaffSection from './components/sections/StaffSection';
-import ContactSection from './components/sections/ContactSection';
 import CalendarPage from './pages/CalendarPage';
 import AboutPage from './pages/AboutPage';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 import GalleryPage from './pages/GalleryPage';
-import GallerySlider from './components/sections/GallerySlider'
+import HomePage from './pages/Home';
 
 function App() {
   return (
@@ -25,28 +20,20 @@ function App() {
           {/* Admin Routes */}
           <Route path="/admin/login" element={<LoginPage />} />
           <Route path="/dashboard" element={<DashboardPage />} />
-          
-          {/* Public Routes */}
+
+          {/* Public Layout */}
           <Route path="/*" element={
             <div className="min-h-screen flex flex-col">
               <Navbar />
               <main className="flex-grow">
                 <Routes>
-                  <Route path="/" element={
-                    <>
-                      <HeroSection />
-                      <AboutSection />
-                      <ServicesSection />
-                      <GallerySlider/>
-                      <PricesSection />
-                      <NewsSection />
-                      <StaffSection />
-                      <ContactSection />
-                    </>
-                  } />
-                  <Route path="/gallery" element={<GalleryPage/>} />
+                  <Route path="/" element={<HomePage />} />
+                  <Route path="/gallery" element={<GalleryPage />} />
                   <Route path="/calendar" element={<CalendarPage />} />
                   <Route path="/about" element={<AboutPage />} />
+
+                  {/* fallback 404 → home */}
+                  <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>
               </main>
               <Footer />

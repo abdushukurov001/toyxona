@@ -1,90 +1,140 @@
-import React from 'react';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Users, Calendar, DollarSign, MessageSquare } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { DashboardStats, CalendarEvent, Message } from '../types';
+import client from '../services';
+import { toast } from 'react-toastify';
 
-// Mock data for demonstration
-const dashboardStats: DashboardStats = {
-  totalStaff: 12,
-  totalEvents: 156,
-  totalRevenue: 280000000,
-  messageCount: 24,
-  upcomingEvents: [
-    {
-      id: 1,
-      title: "Ahmadjonov To'yi",
-      date: new Date('2025-03-20'),
-      eventType: 'wedding',
-      image: 'https://images.pexels.com/photos/1395967/pexels-photo-1395967.jpeg',
-      clientName: 'Ahmadjonov Sardor',
-      clientPhone: '+998 90 123 45 67',
-      price: 180000,
-      guestCount: 200
-    },
-    // Add more events...
-  ],
-  recentMessages: [
-    {
-      id: 1,
-      name: 'Azizov Jasur',
-      phone: '+998 90 123 45 67',
-      message: 'Toy haqida ma\'lumot olmoqchi edim',
-      date: '2025-03-15',
-      read: false
-    },
-    // Add more messages...
-  ],
-  eventTypeStats: [
-    { type: 'To\'y', count: 80, percentage: 51.3 },
-    { type: 'Tug\'ilgan kun', count: 35, percentage: 22.4 },
-    { type: 'Osh', count: 25, percentage: 16 },
-    { type: 'Boshqa', count: 16, percentage: 10.3 }
-  ]
-};
+interface UpcomingEvent {
+  id: number;
+  category: { id: number; name: string; image: string };
+  book_date: string;
+  booker_first_name: string;
+  booker_last_name: string;
+  number_of_guests: number;
+}
+
+interface EventStat {
+  category: string;
+  count: number;
+  percent: number;
+}
+
+interface UnansweredMessage {
+  id: number;
+  first_name: string;
+  last_name: string;
+  phone_number: string;
+  message: string;
+  answered: boolean;
+}
+
+interface DashboardStats {
+  totalStaff: number | null;
+  totalEvents: number | null;
+  totalRevenue: number | null;
+  messageCount: number | null;
+  upcomingEvents: UpcomingEvent[];
+  recentMessages: UnansweredMessage[];
+  eventTypeStats: EventStat[];
+}
 
 const DashboardHomePage: React.FC = () => {
+  const [dashboardStats, setDashboardStats] = useState<DashboardStats>({
+    totalStaff: null,
+    totalEvents: null,
+    totalRevenue: null,
+    messageCount: null,
+    upcomingEvents: [],
+    recentMessages: [],
+    eventTypeStats: [],
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        const [upcomingEventsRes, eventStatsRes, messagesRes, webStatsRes] = await Promise.all([
+          client.get('/uz/api/v1/dashboard/get_upcoming_events/'),
+          client.get('/uz/api/v1/dashboard/get_event_stats/'),
+          client.get('/uz/api/v1/dashboard/get_unanswered_messages/'),
+          client.get('/uz/api/v1/dashboard/get_web_stats/'),
+        ]);
+
+        setDashboardStats({
+          totalStaff: webStatsRes.data.employees,
+          totalEvents: webStatsRes.data.events,
+          totalRevenue: webStatsRes.data.annual_income,
+          messageCount: webStatsRes.data.unanswered_messages,
+          upcomingEvents: upcomingEventsRes.data.slice(0, 3),
+          recentMessages: messagesRes.data.slice(0, 3),
+          eventTypeStats: eventStatsRes.data.map((stat: EventStat) => ({
+            type: stat.category,
+            count: stat.count,
+            percentage: stat.percent,
+          })),
+        });
+      } catch (error: any) {
+        console.error('Dashboard ma\'lumotlarini olishda xatolik:', error);
+        toast.error('Ma\'lumotlarni yuklashda xatolik');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboardData();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <p className="text-lg sm:text-xl text-gray-600 animate-pulse">Yuklanmoqda...</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-8">
+    <div className="p-4 sm:p-6 space-y-6 max-w-7xl mx-auto">
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatsCard
           title="Xodimlar"
-          value={dashboardStats.totalStaff}
+          value={dashboardStats.totalStaff ?? 'Ma\'lumot yo\'q'}
           icon={<Users className="text-blue-500" />}
           color="blue"
         />
         <StatsCard
           title="Tadbirlar"
-          value={dashboardStats.totalEvents}
+          value={dashboardStats.totalEvents ?? 'Ma\'lumot yo\'q'}
           icon={<Calendar className="text-green-500" />}
           color="green"
         />
         <StatsCard
-          title="Yillik daromad"
-          value={`${(dashboardStats.totalRevenue / 1000000).toFixed(1)} mln`}
+          title="Yillik tajriba"
+          value={dashboardStats.totalRevenue ?? 'Ma\'lumot yo\'q'}
           icon={<DollarSign className="text-amber-500" />}
           color="amber"
         />
         <StatsCard
           title="Yangi xabarlar"
-          value={dashboardStats.messageCount}
+          value={dashboardStats.messageCount ?? 'Ma\'lumot yo\'q'}
           icon={<MessageSquare className="text-purple-500" />}
           color="purple"
         />
       </div>
 
       {/* Charts and Lists */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Event Type Chart */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="bg-white rounded-lg shadow-md p-6"
+          className="bg-white rounded-lg shadow-md p-4 sm:p-6"
         >
-          <h3 className="text-lg font-medium mb-6">Tadbirlar statistikasi</h3>
-          <div className="h-80">
+          <h3 className="text-base sm:text-lg font-medium mb-4">Tadbirlar statistikasi</h3>
+          <div className="h-64 sm:h-80">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={dashboardStats.eventTypeStats}>
                 <CartesianGrid strokeDasharray="3 3" />
@@ -102,13 +152,17 @@ const DashboardHomePage: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
-          className="bg-white rounded-lg shadow-md p-6"
+          className="bg-white rounded-lg shadow-md p-4 sm:p-6"
         >
-          <h3 className="text-lg font-medium mb-4">Yaqinlashayotgan tadbirlar</h3>
+          <h3 className="text-base sm:text-lg font-medium mb-4">Yaqinlashayotgan tadbirlar</h3>
           <div className="space-y-4">
-            {dashboardStats.upcomingEvents.map((event) => (
-              <UpcomingEventCard key={event.id} event={event} />
-            ))}
+            {dashboardStats.upcomingEvents.length > 0 ? (
+              dashboardStats.upcomingEvents.map((event) => (
+                <UpcomingEventCard key={event.id} event={event} />
+              ))
+            ) : (
+              <p className="text-gray-600 text-sm sm:text-base">Yaqinlashayotgan tadbirlar yo‘q</p>
+            )}
           </div>
         </motion.div>
 
@@ -117,24 +171,32 @@ const DashboardHomePage: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
-          className="bg-white rounded-lg shadow-md p-6 lg:col-span-2"
+          className="bg-white rounded-lg shadow-md p-4 sm:p-6 lg:col-span-2"
         >
-          <h3 className="text-lg font-medium mb-4">So'nggi xabarlar</h3>
+          <h3 className="text-base sm:text-lg font-medium mb-4">So‘nggi xabarlar</h3>
           <div className="overflow-x-auto">
-            <table className="w-full">
+            <table className="w-full border-collapse border border-gray-300">
               <thead>
-                <tr className="bg-gray-50">
-                  <th className="px-4 py-2 text-left">Sana</th>
-                  <th className="px-4 py-2 text-left">Ism</th>
-                  <th className="px-4 py-2 text-left">Telefon</th>
-                  <th className="px-4 py-2 text-left">Xabar</th>
-                  <th className="px-4 py-2 text-left">Holat</th>
+                <tr className="bg-gray-50 border-b border-gray-300 text-sm sm:text-base">
+                  <th className="px-2 sm:px-4 py-2 text-left border-r border-gray-300">Sana</th>
+                  <th className="px-2 sm:px-4 py-2 text-left border-r border-gray-300">Ism</th>
+                  <th className="px-2 sm:px-4 py-2 text-left border-r border-gray-300">Telefon</th>
+                  <th className="px-2 sm:px-4 py-2 text-left border-r border-gray-300">Xabar</th>
+                  <th className="px-2 sm:px-4 py-2 text-left border-r border-gray-300">Holat</th>
                 </tr>
               </thead>
               <tbody>
-                {dashboardStats.recentMessages.map((message) => (
-                  <MessageRow key={message.id} message={message} />
-                ))}
+                {dashboardStats.recentMessages.length > 0 ? (
+                  dashboardStats.recentMessages.map((message) => (
+                    <MessageRow key={message.id} message={message} />
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={5} className="px-2 sm:px-4 py-2 text-center border-r border-gray-300 text-sm sm:text-base">
+                      Yangi xabarlar yo‘q
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
@@ -156,46 +218,60 @@ const StatsCard: React.FC<StatsCardProps> = ({ title, value, icon, color }) => (
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
     transition={{ duration: 0.5 }}
-    className="bg-white rounded-lg shadow-md p-6"
+    className="bg-white rounded-lg shadow-md p-4 sm:p-6"
   >
     <div className="flex items-center justify-between">
       <div>
         <p className="text-sm text-gray-600">{title}</p>
-        <p className="text-2xl font-semibold mt-1">{value}</p>
+        <p className="text-xl sm:text-2xl font-semibold mt-1">{value}</p>
       </div>
-      <div className={`w-12 h-12 rounded-full bg-${color}-100 flex items-center justify-center`}>
+      <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-${color}-100 flex items-center justify-center`}>
         {icon}
       </div>
     </div>
   </motion.div>
 );
 
-const UpcomingEventCard: React.FC<{ event: CalendarEvent }> = ({ event }) => (
-  <div className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
+const UpcomingEventCard: React.FC<{ event: UpcomingEvent }> = ({ event }) => (
+  <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-4 p-4 bg-gray-50 rounded-lg border border-gray-300">
     <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
-      <img src={event.image} alt={event.title} className="w-full h-full object-cover" />
+      <img
+        src={event.category.image || 'https://images.pexels.com/photos/1395967/pexels-photo-1395967.jpeg'}
+        alt={event.category.name}
+        className="w-full h-full object-cover"
+      />
     </div>
-    <div>
-      <h4 className="font-medium">{event.title}</h4>
+    <div className="flex-1">
+      <h4 className="font-medium text-base sm:text-lg">{event.category.name}</h4>
       <p className="text-sm text-gray-600">
-        {event.date.toLocaleDateString('uz-UZ')} - {event.clientName}
+        {new Date(event.book_date).toLocaleDateString('uz-UZ')} - {event.booker_first_name} {event.booker_last_name}
       </p>
-      <p className="text-sm text-amber-500">{event.guestCount} nafar mehmon</p>
+      <p className="text-sm text-amber-500">{event.number_of_guests} nafar mehmon</p>
     </div>
   </div>
 );
 
-const MessageRow: React.FC<{ message: Message }> = ({ message }) => (
-  <tr className="border-t">
-    <td className="px-4 py-2">{message.date}</td>
-    <td className="px-4 py-2">{message.name}</td>
-    <td className="px-4 py-2">{message.phone}</td>
-    <td className="px-4 py-2">{message.message}</td>
-    <td className="px-4 py-2">
-      <span className={`px-2 py-1 rounded-full text-xs ${
-        message.read ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800'
-      }`}>
-        {message.read ? 'O\'qilgan' : 'Yangi'}
+const MessageRow: React.FC<{ message: UnansweredMessage }> = ({ message }) => (
+  <tr className="border-b border-gray-300 text-sm sm:text-base">
+    <td className="px-2 sm:px-4 py-2 border-r border-gray-300">
+      {new Date().toLocaleDateString('uz-UZ')}
+    </td>
+    <td className="px-2 sm:px-4 py-2 border-r border-gray-300">
+      {message.first_name} {message.last_name}
+    </td>
+    <td className="px-2 sm:px-4 py-2 border-r border-gray-300">{message.phone_number}</td>
+    <td className="px-2 sm:px-4 py-2 border-r border-gray-300">
+      <div className="max-h-[6rem] overflow-y-auto">
+        {message.message}
+      </div>
+    </td>
+    <td className="px-2 sm:px-4 py-2 border-r border-gray-300">
+      <span
+        className={`px-2 py-1 rounded-full text-xs sm:text-sm ${
+          message.answered ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800'
+        }`}
+      >
+        {message.answered ? 'O‘qilgan' : 'Yangi'}
       </span>
     </td>
   </tr>

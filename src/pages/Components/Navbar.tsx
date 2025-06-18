@@ -1,7 +1,7 @@
 
 import { 
     Users, Calendar, Settings, MessageSquare, 
-     Info, Tag, DollarSign, Share2 
+     Info, Tag, DollarSign, Share2, Home ,Newspaper 
   } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -35,7 +35,7 @@ type NavbarProps = {
                       : 'text-gray-600 hover:bg-gray-100'
                   }`}
                 >
-                  <Users size={20} className="mr-3" />
+                  <Home  size={20} className="mr-3" />
                   Bosh sahifa
                 </button>
                 <button
@@ -81,6 +81,17 @@ type NavbarProps = {
                 >
                   <DollarSign size={20} className="mr-3" />
                   Narxlar
+                </button>
+                 <button
+                  onClick={() => setActiveTab('news')}
+                  className={`w-full flex items-center px-4 py-2 rounded-md transition-colors ${
+                    activeTab === 'news' 
+                      ? 'bg-amber-500 text-white' 
+                      : 'text-gray-600 hover:bg-gray-100'
+                  }`}
+                >
+                  <Newspaper  size={20} className="mr-3" />
+                  Yangiliklar
                 </button>
                 <button
                   onClick={() => setActiveTab('about')}
