@@ -1,7 +1,7 @@
 // src/services.ts
 import axios from 'axios';
 
-const APIURL = 'http://127.0.0.1:8000/'; // /uz/ ni komponentlarda qo‘shish kerak emas
+const APIURL = 'https://abdumannof.anonymous.uz/'; // /uz/ ni komponentlarda qo‘shish kerak emas
 
 const client = axios.create({
   baseURL: APIURL,
