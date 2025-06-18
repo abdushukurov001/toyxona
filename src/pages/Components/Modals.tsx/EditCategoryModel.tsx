@@ -6,20 +6,28 @@ import client from '../../../services';
 import { toast } from 'react-toastify';
 import Button from '../../../components/ui/Button';
 
+interface Category {
+  id: number;
+  name: string;
+  description: string;
+  image?: string | null;
+}
+
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onCreated?: () => void;
+  onUpdated?: () => void;
+  category: Category;
 }
 
 interface FormErrors {
   [key: string]: string[];
 }
 
-export const AddCategoryModal: React.FC<ModalProps> = ({ isOpen, onClose, onCreated }) => {
+export const EditCategoryModal: React.FC<ModalProps> = ({ isOpen, onClose, onUpdated, category }) => {
   const [formData, setFormData] = useState({
-    name: '', // Changed back to name
-    description: '',
+    name: category.name,
+    description: category.description,
   });
   const [image, setImage] = useState<File | null>(null);
   const [errors, setErrors] = useState<FormErrors>({});
@@ -55,12 +63,12 @@ export const AddCategoryModal: React.FC<ModalProps> = ({ isOpen, onClose, onCrea
         formDataToSend.append('image', image);
       }
 
-      await client.post('/api/v1/dashboard/create_category/', formDataToSend, {
+      await client.patch(`/api/v1/dashboard/update_category/${category.id}/`, formDataToSend, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
 
-      toast.success("Kategoriya qo‘shildi");
-      onCreated?.();
+      toast.success("Kategoriya yangilandi");
+      onUpdated?.();
       onClose();
     } catch (error: unknown) {
       if (error instanceof Error && 'response' in error) {
@@ -71,10 +79,10 @@ export const AddCategoryModal: React.FC<ModalProps> = ({ isOpen, onClose, onCrea
             errArray.forEach((err) => toast.error(err));
           });
         } else {
-          toast.error("Saqlashda xatolik");
+          toast.error("Yangilashda xatolik");
         }
       } else {
-        toast.error("Saqlashda xatolik");
+        toast.error("Yangilashda xatolik");
       }
       console.error("Submit error:", error);
     }
@@ -86,7 +94,7 @@ export const AddCategoryModal: React.FC<ModalProps> = ({ isOpen, onClose, onCrea
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="flex justify-between items-center">
             <Dialog.Title className="text-2xl font-serif font-bold text-gray-800">
-              Yangi tadbir turi qo'shish
+              Tadbir turini tahrirlash
             </Dialog.Title>
             <Button
               type="button"
@@ -115,14 +123,28 @@ export const AddCategoryModal: React.FC<ModalProps> = ({ isOpen, onClose, onCrea
               onChange={handleChange}
               error={errors.description?.[0]}
             />
-            <FormInput
-              label="Rasm"
-              name="image"
-              type="file"
-              onChange={handleImageChange}
-              accept="image/*"
-              error={errors.image?.[0]}
-            />
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-medium text-gray-700">
+                Joriy rasm
+              </label>
+              {category.image ? (
+                <img
+                  src={category.image}
+                  alt={formData.name}
+                  className="w-32 h-32 object-cover rounded border border-gray-300"
+                />
+              ) : (
+                <span className="text-gray-500">Rasm yo'q</span>
+              )}
+              <FormInput
+                label="Yangi rasm"
+                name="image"
+                type="file"
+                onChange={handleImageChange}
+                accept="image/*"
+                error={errors.image?.[0]}
+              />
+            </div>
           </div>
           <FormActions onClose={onClose} submitText={''} isSubmitting={false} />
         </form>

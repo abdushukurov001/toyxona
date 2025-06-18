@@ -16,9 +16,10 @@ import SocialMediaForm from './Components/SocialMediaForm';
 import SettingsForm from './Components/SettingsForm';
 import { AddEventModal } from './Components/Modals.tsx/AddEventModel';
 import { AddCategoryModal } from './Components/Modals.tsx/AddCategoryModel';
-import { AddPricePackageModal } from './Components/Modals.tsx/AddPriceModel';
+// import { AddPricePackageModal } from './Components/Modals.tsx/AddPriceModel';
 import { EditAboutModal } from './Components/Modals.tsx/EditAboutModal';
 import { AddStaffModal } from './Components/Modals.tsx/AddStaffModel';
+import NewsManager from './Components/NewsSection';
 
 
 
@@ -31,7 +32,7 @@ const DashboardPage: React.FC = () => {
   const [isAddEventModalOpen, setIsAddEventModalOpen] = useState(false);
   const [isEditAboutModalOpen, setIsEditAboutModalOpen] = useState(false);
   const [isAddCategoryModalOpen, setIsAddCategoryModalOpen] = useState(false);
-  const [isAddPricePackageModalOpen, setIsAddPricePackageModalOpen] = useState(false);
+  const [, setIsAddPricePackageModalOpen] = useState(false);
 
   if (!user.isAuthenticated) {
     navigate('/admin/login');
@@ -43,24 +44,24 @@ const DashboardPage: React.FC = () => {
       case 'home':
         return <DashboardHomePage />;
       case 'staff':
-        return   <StaffList onAddStaff={() => {
-      console.log("Add button bosildi"); // Bu ham muhim!
-      setIsAddStaffModalOpen(true);
-    }} />
+        return   <StaffList
+     />
       case 'events':
         return <EventsTab onAddEvent={() => setIsAddEventModalOpen(true)} />;
       case 'categories':
         return <CategoryTab onAddCategory={() => setIsAddCategoryModalOpen(true)} />;
-      case 'prices':
+         case 'prices':
         return <PriceTab onAddPricePackage={() => setIsAddPricePackageModalOpen(true)} />;
+      case 'news':
+        return <NewsManager/>;
       case 'about':
-        return <AboutTab onEditAbout={() => setIsEditAboutModalOpen(true)} />;
+        return <AboutTab />;
       case 'messages':
-        return <MessagesTab messages={sampleMessages} onDeleteMessage={() => {}} />;
+        return <MessagesTab  />;
       case 'social':
         return (
           <div>
-            <h2 className="text-xl font-serif mb-6">Ijtimoiy tarmoqlar</h2>
+            {/* <h2 className="text-xl font-serif mb-6">Ijtimoiy tarmoqlar</h2> */}
             <SocialMediaForm />
           </div>
         );
@@ -85,7 +86,7 @@ const DashboardPage: React.FC = () => {
             variant="outline" 
             onClick={() => {
               logout();
-              navigate('/admin/login');
+              navigate('/');
             }}
           >
             <LogOut size={18} className="mr-2" />
@@ -130,10 +131,10 @@ const DashboardPage: React.FC = () => {
         onClose={() => setIsAddCategoryModalOpen(false)} 
       />
       
-      <AddPricePackageModal 
+      {/* <AddPricePackageModal 
         isOpen={isAddPricePackageModalOpen} 
         onClose={() => setIsAddPricePackageModalOpen(false)} 
-      />
+      /> */}
       
       <EditAboutModal 
         isOpen={isEditAboutModalOpen} 
@@ -143,14 +144,5 @@ const DashboardPage: React.FC = () => {
   );
 };
 
-const sampleMessages = [
-  {
-    date: '2025-03-15',
-    name: 'Azizov Jasur',
-    phone: '+998 90 123 45 67',
-    message: 'Toy haqida ma\'lumot olmoqchi edim',
-    status: 'Yangi'
-  }
-];
 
 export default DashboardPage;

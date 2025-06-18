@@ -26,34 +26,35 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<AuthUser>({ username: '', isAuthenticated: false });
 
   useEffect(() => {
-    const token = localStorage.getItem('accessToken');
+    const token = localStorage.getItem('access_token');
     const username = localStorage.getItem('username');
     if (token && username) {
       setUser({ username, isAuthenticated: true });
     }
   }, []);
 
-  const login = async (username: string, password: string): Promise<boolean> => {
-    try {
-      const response = await client.post('/api/v1/auth/login/', {
-        username,
-        password,
-      });
+const login = async (username: string, password: string): Promise<boolean> => {
+  try {
+    const response = await client.post('/api/v1/auth/login/', {
+      username,
+      password,
+    });
 
-      const { access, user } = response.data;
+    const { access_token } = response.data;
 
-      // Token + username ni saqlash
-      localStorage.setItem('accessToken', access);
-      localStorage.setItem('username', user?.username || username);
+    // Token + username ni saqlash
+    localStorage.setItem('access_token', access_token);
+    localStorage.setItem('username', username); // agar username ni qaytarmasa, inputdan olinganini yozamiz
 
-      setUser({ username: user?.username || username, isAuthenticated: true });
+    setUser({ username, isAuthenticated: true });
 
-      return true;
-    } catch (error) {
-      console.error('Login error:', error);
-      return false;
-    }
-  };
+    return true;
+  } catch (error) {
+    console.error('Login error:', error);
+    return false;
+  }
+};
+
 
   const logout = async (): Promise<void> => {
     try {
@@ -61,7 +62,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
-      localStorage.removeItem('accessToken');
+      localStorage.removeItem('access_token');
       localStorage.removeItem('username');
       setUser({ username: '', isAuthenticated: false });
     }

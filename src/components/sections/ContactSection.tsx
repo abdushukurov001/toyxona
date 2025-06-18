@@ -1,6 +1,4 @@
-
 import React, { useEffect, useState } from 'react';
-// import { motion } from 'framer-motion';
 import SectionHeading from '../ui/SectionHeading';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -32,7 +30,6 @@ const ContactSection: React.FC = () => {
 
   const extractCoordinatesFromUrl = (url: string): [number, number] | null => {
     try {
-      // Google Maps URL: q=lat,lng
       const googleMatch = url.match(/q=([-]?\d+\.\d+),([-]?\d+\.\d+)/);
       if (googleMatch) {
         const lat = parseFloat(googleMatch[1]);
@@ -41,7 +38,6 @@ const ContactSection: React.FC = () => {
         return [lat, lng];
       }
 
-      // Yandex Maps URL: ll=long,lat
       const yandexMatch = url.match(/ll=([0-9.-]+)%2C([0-9.-]+)/);
       if (yandexMatch) {
         const lng = parseFloat(yandexMatch[1]);
@@ -50,7 +46,6 @@ const ContactSection: React.FC = () => {
         return [lat, lng];
       }
 
-      // Other formats
       const patterns = [
         /@([-]?\d+\.\d+),([-]?\d+\.\d+)/,
         /!3d([-]?\d+\.\d+)!4d([-]?\d+\.\d+)/,
@@ -115,7 +110,7 @@ const ContactSection: React.FC = () => {
 
   return (
     <section id="contact" className="py-20 bg-gray-50">
-      <ToastContainer />
+      <ToastContainer theme="colored" />
       <div className="container mx-auto px-4 md:px-6">
         <SectionHeading
           title="Biz bilan bog'lanish"

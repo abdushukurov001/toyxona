@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React from 'react';
 import { Dialog } from '@headlessui/react';
 import { FormInput, FormTextarea, FormActions } from './FormComponents';
@@ -17,17 +18,24 @@ export const EditAboutModal: React.FC<ModalProps> = ({ isOpen, onClose }) => (
           <FormTextarea
             label="Asosiy ma'lumot"
             rows={4}
-            defaultValue="2015-yildan buyon biz mijozlarimizga yuqori sifatli xizmat ko'rsatib kelmoqdamiz. Bizning to'yxonamiz zamonaviy jihozlar, professional xodimlar va qulay sharoitlar bilan ta'minlangan."
-          />
-          <FormInput label="Rasm" type="file" accept="image/*" />
+            defaultValue="2015-yildan buyon biz mijozlarimizga yuqori sifatli xizmat ko'rsatib kelmoqdamiz. Bizning to'yxonamiz zamonaviy jihozlar, professional xodimlar va qulay sharoitlar bilan ta'minlangan." name={''} onChange={function (e: React.ChangeEvent<HTMLTextAreaElement>): void {
+              throw new Error('Function not implemented.');
+            } }          />
+          <FormInput label="Rasm" type="file" accept="image/*" name={''} onChange={function (e: React.ChangeEvent<HTMLInputElement>): void {
+            throw new Error('Function not implemented.');
+          } } />
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Statistika</label>
             <div className="space-y-4">
-              <FormInput label="Muvaffaqiyatli tadbirlar" type="number" defaultValue={1000} smallLabel />
-              <FormInput label="Mijozlar tavsiyasi (%)" type="number" defaultValue={98} smallLabel />
+              <FormInput label="Muvaffaqiyatli tadbirlar" type="number" defaultValue={1000} smallLabel name={''} onChange={function (e: React.ChangeEvent<HTMLInputElement>): void {
+                throw new Error('Function not implemented.');
+              } } />
+              <FormInput label="Mijozlar tavsiyasi (%)" type="number" defaultValue={98} smallLabel name={''} onChange={function (e: React.ChangeEvent<HTMLInputElement>): void {
+                throw new Error('Function not implemented.');
+              } } />
             </div>
           </div>
-          <FormActions onClose={onClose} />
+          <FormActions onClose={onClose} submitText={''} isSubmitting={false} />
         </div>
       </div>
     </div>
