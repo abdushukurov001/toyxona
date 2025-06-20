@@ -164,6 +164,14 @@ const NewsManager: React.FC = () => {
     setImageFile(null);
   };
 
+  // Open create modal with cleared inputs
+  const openAddModal = () => {
+    setFormData({ title: "", description: "" });
+    setImageFile(null);
+    setImagePreview(null);
+    setIsAddModalOpen(true);
+  };
+
   // Truncate description
   const truncateDescription = (text: string, maxLength: number = 50) => {
     if (text.length <= maxLength) return text;
@@ -175,7 +183,7 @@ const NewsManager: React.FC = () => {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
         <h2 className="text-lg sm:text-xl font-serif">Yangiliklar</h2>
         <Button
-          onClick={() => setIsAddModalOpen(true)}
+          onClick={openAddModal}
           className="w-full sm:w-auto min-h-[40px] bg-orange-400 hover:bg-orange-500 text-white text-sm sm:text-base"
         >
           <PlusCircle size={16} className="mr-2" />
@@ -245,7 +253,7 @@ const NewsManager: React.FC = () => {
       <Dialog open={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} className="relative z-50">
         <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
         <div className="fixed inset-0 flex items-center justify-center p-4 overflow-y-auto">
-          <Dialog.Panel className="w-full max-w-md rounded bg-white p-4 sm:p-6">
+          <Dialog.Panel className="w-full max-w-md max-h-[80vh] overflow-y-auto rounded bg-white p-4 sm:p-6">
             <Dialog.Title className="text-lg sm:text-xl font-semibold mb-4">
               Yangi yangilik qo'shish
             </Dialog.Title>
@@ -307,7 +315,7 @@ const NewsManager: React.FC = () => {
                     setImageFile(null);
                     setImagePreview(null);
                   }}
-                  className="min-h-[40px] bg-gray-500  text-sm sm:text-base"
+                  className="min-h-[40px] bg-gray-500 text-sm sm:text-base"
                 >
                   Bekor qilish
                 </Button>
@@ -327,7 +335,7 @@ const NewsManager: React.FC = () => {
       <Dialog open={!!editItem} onClose={() => setEditItem(null)} className="relative z-50">
         <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
         <div className="fixed inset-0 flex items-center justify-center p-4 overflow-y-auto">
-          <Dialog.Panel className="w-full max-w-md rounded bg-white p-4 sm:p-6">
+          <Dialog.Panel className="w-full max-w-md max-h-[80vh] overflow-y-auto rounded bg-white p-4 sm:p-6">
             <Dialog.Title className="text-lg sm:text-xl font-semibold mb-4">
               Yangilikni tahrirlash
             </Dialog.Title>
@@ -389,13 +397,13 @@ const NewsManager: React.FC = () => {
                     setImageFile(null);
                     setImagePreview(null);
                   }}
-                  className="min-h-[40px] bg-gray-500   text-sm sm:text-base"
+                  className="min-h-[40px] bg-gray-500 text-sm sm:text-base"
                 >
                   Bekor qilish
                 </Button>
                 <Button
                   type="submit"
-                  className="min-h-[40px]  text-white text-sm sm:text-base"
+                  className="min-h-[40px] text-white text-sm sm:text-base"
                 >
                   Saqlash
                 </Button>
@@ -409,7 +417,7 @@ const NewsManager: React.FC = () => {
       <Dialog open={isViewModalOpen} onClose={closeViewModal} className="relative z-50">
         <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
         <div className="fixed inset-0 flex items-center justify-center p-4 overflow-y-auto">
-          <Dialog.Panel className="w-full max-w-md rounded bg-white p-4 sm:p-6">
+          <Dialog.Panel className="w-full max-w-md max-h-[80vh] overflow-y-auto rounded bg-white p-4 sm:p-6">
             <Dialog.Title className="text-lg sm:text-xl font-semibold mb-4">
               To'liq yangilik
             </Dialog.Title>
@@ -420,7 +428,7 @@ const NewsManager: React.FC = () => {
               </div>
               <div>
                 <p className="text-sm font-medium text-gray-700">Tavsif:</p>
-                <p className="text-sm sm:text-base max-h-48 overflow-y-auto">{selectedNews?.description}</p>
+                <p className="text-sm sm:text-base">{selectedNews?.description}</p>
               </div>
               {selectedNews?.image && (
                 <div>
@@ -438,7 +446,7 @@ const NewsManager: React.FC = () => {
                 type="button"
                 variant="outline"
                 onClick={closeViewModal}
-                className="min-h-[40px] bg-gray-500 hover:bg-gray-600 text-white text-sm sm:text-base"
+                className="min-h-[40px] text-sm sm:text-base"
               >
                 Yopish
               </Button>
