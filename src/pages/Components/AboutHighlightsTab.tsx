@@ -73,7 +73,7 @@ const AboutUsHighlights = () => {
       } else {
         // Create new highlight
         await client.post(
-          '/uz/api/v1/dashboard/create_web_setting/',
+          '/uz/api/v1/dashboard/create_about_us_highlight/',
           formData
         );
         toast.success('Yangi maʼlumot qoʻshildi');
@@ -144,7 +144,7 @@ const AboutUsHighlights = () => {
                 <Button
                   size="sm"
                   variant="outline"
-                  className="flex-1 sm:flex-none min-h-[40px] text-red-500 hover:bg-red-50 text-sm"
+                  className="flex-1 sm:flex-none min-h-[40px] hover:bg-red-500 text-red-500  text-sm"
                   onClick={() => handleDelete(highlight.id)}
                 >
                   <Trash2 size={14} className="mr-1" />
