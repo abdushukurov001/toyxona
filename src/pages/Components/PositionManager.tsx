@@ -22,7 +22,7 @@ const PositionManager = () => {
   const fetchPositions = async () => {
     setLoading(true);
     try {
-      const response = await client.get('/uz/api/v1/dashboard/get_all_positions/');
+      const response = await client.get('/api/v1/dashboard/get_all_positions/');
       setPositions(response.data);
     } catch (err) {
       setError('Lavozimlarni yuklashda xatolik');
@@ -49,14 +49,14 @@ const PositionManager = () => {
       if (currentPosition) {
         // Update existing position
         await client.patch(
-          `/uz/api/v1/dashboard/update_position/${currentPosition.id}/`,
+          `/api/v1/dashboard/update_position/${currentPosition.id}/`,
           { name: positionName }
         );
         toast.success('Lavozim muvaffaqiyatli yangilandi');
       } else {
         // Create new position
         await client.post(
-          '/uz/api/v1/dashboard/create_position/',
+          '/api/v1/dashboard/create_position/',
           { name: positionName }
         );
         toast.success('Yangi lavozim qo\'shildi');
@@ -72,7 +72,7 @@ const PositionManager = () => {
   // Delete position
  const handleDelete = async (id: number) => {
   try {
-    await client.delete(`/uz/api/v1/dashboard/delete_position/${id}/`);
+    await client.delete(`/api/v1/dashboard/delete_position/${id}/`);
     toast.success('Lavozim o\'chirildi');
     fetchPositions();
   } catch (error) {

@@ -48,7 +48,7 @@ const EditStaffModal: React.FC<EditStaffModalProps> = ({
   useEffect(() => {
     const fetchPositions = async () => {
       try {
-        const response = await client.get('/uz/api/v1/dashboard/get_all_positions/');
+        const response = await client.get('/api/v1/dashboard/get_all_positions/');
         const allPositions = response.data as Position[];
         setPositions(allPositions);
 
@@ -105,8 +105,8 @@ const EditStaffModal: React.FC<EditStaffModalProps> = ({
 
     try {
       const url = isAdding
-        ? '/uz/api/v1/dashboard/create_our_team/'
-        : `/uz/api/v1/dashboard/update_our_team/${formData.id}/`;
+        ? '/api/v1/dashboard/create_our_team/'
+        : `/api/v1/dashboard/update_our_team/${formData.id}/`;
       const method = isAdding ? client.post : client.patch;
 
       const formDataToSend = new FormData();

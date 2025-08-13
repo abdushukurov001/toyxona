@@ -29,7 +29,7 @@ const PricesSection: React.FC = () => {
   useEffect(() => {
     const fetchPrices = async () => {
       try {
-        const response = await client.get('/uz/api/v1/web/get_prices/');
+        const response = await client.get('/api/v1/web/get_prices/');
         setPrices(response.data);
         setError(null);
       } catch (err) {

@@ -17,7 +17,7 @@ const QRCodeComponent: React.FC = () => {
   // QR kodni olish
   const fetchQRCode = async () => {
     try {
-      const response = await client.get<QRCode[]>('/uz/api/v1/dashboard/get_qr_code/');
+      const response = await client.get<QRCode[]>('/api/v1/dashboard/get_qr_code/');
       const data = response.data;
       if (Array.isArray(data) && data.length > 0) {
         setQrCode(data[0]);
@@ -44,7 +44,7 @@ const QRCodeComponent: React.FC = () => {
     }
 
     try {
-      const response = await client.post<QRCode>('/uz/api/v1/dashboard/create_qr_code/', { url });
+      const response = await client.post<QRCode>('/api/v1/dashboard/create_qr_code/', { url });
       setQrCode(response.data);
       setUrl(response.data.url);
       setError('');
@@ -68,7 +68,7 @@ const QRCodeComponent: React.FC = () => {
 
     try {
       await client.patch<QRCode>(
-        `/uz/api/v1/dashboard/update_qr_code/${qrCode.id}/`,
+        `/api/v1/dashboard/update_qr_code/${qrCode.id}/`,
         { url }
       );
       await fetchQRCode();

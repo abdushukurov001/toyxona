@@ -29,7 +29,7 @@ const NewsManager: React.FC = () => {
   const fetchNews = async () => {
     setLoading(true);
     try {
-      const res = await client.get<NewsItem[]>("/uz/api/v1/dashboard/get_all_news/");
+      const res = await client.get<NewsItem[]>("/api/v1/dashboard/get_all_news/");
       setNewsItems(res.data);
       setError(null);
     } catch (err) {
@@ -79,7 +79,7 @@ const NewsManager: React.FC = () => {
         data.append("image", imageFile);
       }
 
-      await client.post("/uz/api/v1/dashboard/create_news/", data, {
+      await client.post("/api/v1/dashboard/create_news/", data, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       toast.success("Yangilik qo‘shildi");
@@ -113,7 +113,7 @@ const NewsManager: React.FC = () => {
         data.append("image", imageFile);
       }
 
-      await client.patch(`/uz/api/v1/dashboard/update_news/${editItem.id}/`, data, {
+      await client.patch(`/api/v1/dashboard/update_news/${editItem.id}/`, data, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       toast.success("Yangilik yangilandi");
@@ -135,7 +135,7 @@ const NewsManager: React.FC = () => {
   // Handle delete news
   const handleDelete = async (id: number) => {
     try {
-      await client.delete(`/uz/api/v1/dashboard/delete_news/${id}/`);
+      await client.delete(`/api/v1/dashboard/delete_news/${id}/`);
       setNewsItems((prev) => prev.filter((item) => item.id !== id));
       toast.success("Yangilik o‘chirildi");
     } catch (err) {

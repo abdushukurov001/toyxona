@@ -69,7 +69,7 @@ export const AddPriceModal: React.FC<ModalProps> = ({ isOpen, onClose, onCreated
     }
 
     try {
-      await client.post('/uz/api/v1/dashboard/create_price/', {
+      await client.post('/api/v1/dashboard/create_price/', {
         type: formData.type,
         price: priceValue,
         description: formData.description,
