@@ -26,7 +26,7 @@ const AboutUsHighlights = () => {
   const fetchHighlights = async () => {
     setLoading(true);
     try {
-      const response = await client.get('/uz/api/v1/dashboard/get_about_us_highlight/');
+      const response = await client.get('/api/v1/dashboard/get_about_us_highlight/');
       setHighlights(response.data);
     } catch (err) {
       setError('Maʼlumotlarni yuklashda xatolik yuz berdi');
@@ -66,14 +66,14 @@ const AboutUsHighlights = () => {
       if (currentHighlight) {
         // Update existing highlight
         await client.patch(
-          `/uz/api/v1/dashboard/update_about_us_highlight/${currentHighlight.id}/`,
+          `/api/v1/dashboard/update_about_us_highlight/${currentHighlight.id}/`,
           formData
         );
         toast.success('Maʼlumot muvaffaqiyatli yangilandi');
       } else {
         // Create new highlight
         await client.post(
-          '/uz/api/v1/dashboard/create_about_us_highlight/',
+          '/api/v1/dashboard/create_about_us_highlight/',
           formData
         );
         toast.success('Yangi maʼlumot qoʻshildi');
@@ -89,7 +89,7 @@ const AboutUsHighlights = () => {
   // Delete highlight
   const handleDelete = async (id: number) => {
     try {
-      await client.delete(`/uz/api/v1/dashboard/delete_about_us_highlight/${id}/`);
+      await client.delete(`/api/v1/dashboard/delete_about_us_highlight/${id}/`);
       toast.success('Maʼlumot oʻchirildi');
       fetchHighlights();
     } catch (error) {

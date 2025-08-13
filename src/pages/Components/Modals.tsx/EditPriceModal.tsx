@@ -59,7 +59,7 @@ export const EditPriceModal: React.FC<ModalProps> = ({ isOpen, onClose, onUpdate
     try {
       if (editingHighlight) {
         // Update existing highlight
-        await client.patch(`/uz/api/v1/dashboard/update_price_highlight/${editingHighlight.id}/`, {
+        await client.patch(`/api/v1/dashboard/update_price_highlight/${editingHighlight.id}/`, {
           description: newHighlight.trim(),
         });
         setHighlights((prev) =>
@@ -70,7 +70,7 @@ export const EditPriceModal: React.FC<ModalProps> = ({ isOpen, onClose, onUpdate
         toast.success("Xizmat yangilandi");
       } else {
         // Add new highlight using the new endpoint
-        const response = await client.post(`/uz/api/v1/dashboard/create_price_highlight/${price.id}/`, {
+        const response = await client.post(`/api/v1/dashboard/create_price_highlight/${price.id}/`, {
           description: newHighlight.trim(),
         });
         setHighlights((prev) => [...prev, response.data]);
@@ -91,7 +91,7 @@ export const EditPriceModal: React.FC<ModalProps> = ({ isOpen, onClose, onUpdate
 
   const handleRemoveHighlight = async (id: number) => {
     try {
-      await client.delete(`/uz/api/v1/dashboard/delete_price_highlight/${id}/`);
+      await client.delete(`/api/v1/dashboard/delete_price_highlight/${id}/`);
       setHighlights((prev) => prev.filter((h) => h.id !== id));
       if (editingHighlight?.id === id) {
         setEditingHighlight(null);
@@ -127,7 +127,7 @@ export const EditPriceModal: React.FC<ModalProps> = ({ isOpen, onClose, onUpdate
 
     try {
       // Update price details
-      await client.patch(`/uz/api/v1/dashboard/update_price/${price.id}/`, {
+      await client.patch(`/api/v1/dashboard/update_price/${price.id}/`, {
         type: formData.type,
         price: priceValue,
         description: formData.description,

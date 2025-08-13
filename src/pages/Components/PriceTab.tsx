@@ -35,7 +35,7 @@ const PriceTab: React.FC<PriceTabProps> = () => {
   const fetchPrices = async () => {
     setLoading(true);
     try {
-      const response = await client.get<Price[]>("/uz/api/v1/dashboard/get_all_prices/");
+      const response = await client.get<Price[]>("/api/v1/dashboard/get_all_prices/");
       setPrices(response.data);
       setError(null);
     } catch (err) {
@@ -53,7 +53,7 @@ const PriceTab: React.FC<PriceTabProps> = () => {
   const handleDeletePrice = async (id: number) => {
     if (window.confirm("Ushbu narxni rostdan ham o'chirmoqchimisiz?")) {
       try {
-        await client.delete(`/uz/api/v1/dashboard/delete_price/${id}/`);
+        await client.delete(`/api/v1/dashboard/delete_price/${id}/`);
         setPrices((prev) => prev.filter((price) => price.id !== id));
         toast.success("Narx o'chirildi");
       } catch (error) {

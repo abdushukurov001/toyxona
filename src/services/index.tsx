@@ -1,7 +1,7 @@
 // src/services.ts
 import axios from 'axios';
 
-const APIURL = 'https://abdumannof.anonymous.uz/'; // /uz/ ni komponentlarda qo‘shish kerak emas
+const APIURL = 'https://api.wedding.websdev.uz/'; // /uz/ ni komponentlarda qo‘shish kerak emas
 
 const client = axios.create({
   baseURL: APIURL,
@@ -13,13 +13,13 @@ client.interceptors.request.use((config) => {
   const isLogin = config.url?.includes('/auth/login/');
   const csrfToken = document.cookie.match(/csrftoken=([^;]+)/)?.[1];
 
-  // /uz/ prefiksini qo‘shish
-  if (!config.url?.startsWith('/uz/') && config.url?.startsWith('/api/v1/')) {
-    config.url = `/uz${config.url}`;
-  }
+  // // /uz/ prefiksini qo‘shish
+  // if (!config.url?.startsWith('/uz/') && config.url?.startsWith('/api/v1/')) {
+  //   config.url = `/uzz${config.url}`;
+  // }
 
   // Token qo‘shish
-  if (token && !isLogin && !config.url?.includes('/uz/api/v1/web/')) {
+  if (token && !isLogin && !config.url?.includes('/api/v1/web/')) {
     config.headers.Authorization = `Bearer ${token}`;
   }
 

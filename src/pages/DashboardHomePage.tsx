@@ -56,10 +56,10 @@ const DashboardHomePage: React.FC = () => {
     const fetchDashboardData = async () => {
       try {
         const [upcomingEventsRes, eventStatsRes, messagesRes, webStatsRes] = await Promise.all([
-          client.get('/uz/api/v1/dashboard/get_upcoming_events/'),
-          client.get('/uz/api/v1/dashboard/get_event_stats/'),
-          client.get('/uz/api/v1/dashboard/get_unanswered_messages/'),
-          client.get('/uz/api/v1/dashboard/get_web_stats/'),
+          client.get('/api/v1/dashboard/get_upcoming_events/'),
+          client.get('/api/v1/dashboard/get_event_stats/'),
+          client.get('/api/v1/dashboard/get_unanswered_messages/'),
+          client.get('/api/v1/dashboard/get_web_stats/'),
         ]);
 
         setDashboardStats({

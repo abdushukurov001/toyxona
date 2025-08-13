@@ -26,7 +26,7 @@ const NewsSection: React.FC = () => {
   useEffect(() => {
     const fetchNews = async () => {
       try {
-        const res = await client.get('/uz/api/v1/web/get_news/');
+        const res = await client.get('/api/v1/web/get_news/');
         setNewsItems(res.data);
       } catch (error) {
         console.error('Yangiliklarni yuklashda xatolik:', error);

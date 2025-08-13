@@ -33,7 +33,7 @@ export const AddStaffModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
   useEffect(() => {
     const fetchPositions = async () => {
       try {
-        const response = await client.get('/uz/api/v1/dashboard/get_all_positions/');
+        const response = await client.get('/api/v1/dashboard/get_all_positions/');
         setPositions(response.data);
       } catch (error) {
         console.error('Pozitsiyalarni olishda xatolik:', error);
@@ -108,7 +108,7 @@ export const AddStaffModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
     }
 
     try {
-      const response = await client.post('/uz/api/v1/dashboard/create_our_team/', form);
+      const response = await client.post('/api/v1/dashboard/create_our_team/', form);
       console.log('API Response:', response.data);
       toast.success("Xodim muvaffaqiyatli qo'shildi");
       onClose();
